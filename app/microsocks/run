@@ -1,0 +1,16 @@
+#!/bin/sh
+sleep 10
+
+# so return traffic that went through VPN works
+gw=$(ip route | awk '/default/ {print $3}')
+ip route add to ${LOCAL_NETWORK} via $gw dev eth0
+
+# start
+
+echo "###### Starting microsocks ######"
+echo "#"
+echo "# Logging to /logs/microsocks.log"
+echo "#"
+echo "#################################"
+echo
+microsocks -i 0.0.0.0 -p 18080 2>&1 | tee /logs/microsocks.log 

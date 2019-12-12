@@ -1,0 +1,15 @@
+#!/bin/sh
+sleep 30
+
+# so return traffic that went through VPN works
+gw=$(ip route | awk '/default/ {print $3}')
+ip route add to ${LOCAL_NETWORK} via $gw dev eth0
+
+# start
+echo "** Starting screen session with irssi..."
+
+su - user screen -c "screen -dmS irssi /usr/local/bin/irssi"
+
+# we just wait forever now
+read
+
