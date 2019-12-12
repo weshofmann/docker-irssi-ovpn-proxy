@@ -1,5 +1,5 @@
 #!/bin/sh
-sleep 30
+sleep 60
 
 # so return traffic that went through VPN works
 gw=$(ip route | awk '/default/ {print $3}')
@@ -11,5 +11,4 @@ echo "** Starting screen session with irssi..."
 su - user screen -c "screen -dmS irssi /usr/local/bin/irssi"
 
 # we just wait forever now
-read
-
+while true; do sleep 60; done
