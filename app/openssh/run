@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo "[SSH]"
+echo "[SSH] * Starting SSH daemon"
+touch /logs/openssh.log
+tail -f /logs/openssh.log &
+/usr/sbin/sshd -E /logs/openssh.log -D \
+    -o "PasswordAuthentication no" \
+    -o "PubkeyAuthentication yes" 

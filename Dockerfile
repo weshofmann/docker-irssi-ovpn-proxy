@@ -17,6 +17,7 @@ FROM irssi:alpine
 
 EXPOSE 8080
 EXPOSE 18080
+EXPOSE 22
 
 USER root
 ARG release=2.6.1
@@ -47,7 +48,13 @@ RUN apk --update --no-cache add \
       runit \
       screen \
       bash \
-      rsync
+      rsync \
+      openssh
+
+RUN /usr/bin/ssh-keygen -A
+
+RUN /bin/sed -i 's/home\/user:/home\/user:\/bin\/bash/' /etc/passwd \
+      && /usr/bin/passwd -u user
 
 COPY app /app
 
@@ -55,8 +62,6 @@ COPY --from=build-img /build/microsocks/microsocks /usr/bin
 
 RUN find /app -name run | xargs chmod a+rx \
       && chmod a+w /app/* \
-      && mkdir /app-config \
-      && chmod a+rwx /app-config \
       && mkdir /logs \
       && chmod a+rwx /logs
 
@@ -64,5 +69,16 @@ ENV OPENVPN_FILE_SUBPATH=pia/uk-london.ovpn \
     OPENVPN_USERNAME=null \
     OPENVPN_PASSWORD=null \
     LOCAL_NETWORK=192.168.1.0/24
+
+RUN mkdir /home/user/.ssh \
+      && chmod 700 /home/user/.ssh
+
+COPY ssh_keys/* /home/user/.ssh/
+
+RUN cp /home/user/.ssh/irssi_user.pub /home/user/.ssh/authorized_keys \
+      && chmod 600 /home/user/.ssh/irssi_user \
+      && chmod 600 /home/user/.ssh/irssi_user.pub /home/user/.ssh/authorized_keys \
+      && chown -R user /home/user/.ssh
+
 
 CMD ["runsvdir", "/app"]
